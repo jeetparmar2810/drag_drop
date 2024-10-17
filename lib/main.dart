@@ -1,44 +1,32 @@
 import 'package:dragdrop/app/utils/dimens.dart';
 import 'package:flutter/material.dart';
-import 'app/widgets/draggable_item.dart';
 
-/// Entry point of the application.
+import 'app/widgets/dock_icon.dart';
+
 void main() {
   runApp(const MyApp());
 }
 
-/// Widget that builds the MaterialApp.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Draggable Dock',
+    return const MaterialApp(
+      title: 'Apple Dock Effect',
       home: Scaffold(
         body: Center(
-          child: Dock(
-            items: const [
-              Icons.person,
-              Icons.message,
-              Icons.call,
-              Icons.camera,
-              Icons.photo,
-            ],
-            builder: (icon) {
-              return Container(
-                constraints: const BoxConstraints(minWidth:  Dimens.height,),
-                height: Dimens.height,
-                margin: const EdgeInsets.all(Dimens.margin_8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(Dimens.margin_8),
-                  color: Colors.primaries[icon.hashCode % Colors.primaries.length],
-                ),
-                child: Center(
-                  child: Icon(icon, color: Colors.white),
-                ),
-              );
-            },
+          child: SizedBox(
+            height: Dimens.sizeBox, // Adjust height for the dock.
+            child: Dock(
+              items: [
+                Icons.person,
+                Icons.message,
+                Icons.call,
+                Icons.camera,
+                Icons.photo,
+              ],
+            ),
           ),
         ),
       ),
@@ -46,27 +34,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// A Dock widget that allows reordering of items.
-class Dock<T extends Object> extends StatefulWidget {
-  const Dock({
-    super.key,
-    this.items = const [],
-    required this.builder,
-  });
+/// Dock widget with Apple-like scaling effect.
+class Dock extends StatefulWidget {
+  const Dock({super.key, required this.items});
 
-  /// Initial items to put in this Dock.
-  final List<T> items;
-
-  /// Builder that creates a widget for each item.
-  final Widget Function(T) builder;
+  final List<IconData> items;
 
   @override
-  State<Dock<T>> createState() => _DockState<T>();
+  State<Dock> createState() => _DockState();
 }
 
-/// State of the Dock used to manipulate the items.
-class _DockState<T extends Object> extends State<Dock<T>> {
-  late final List<T> _dockerItems = List.from(widget.items);
+class _DockState extends State<Dock> {
+  late final List<IconData> _icons = List.of(widget.items);
+  int? _draggingIndex;
+  double _dragOffsetX = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -75,35 +56,62 @@ class _DockState<T extends Object> extends State<Dock<T>> {
         borderRadius: BorderRadius.circular(Dimens.radius_8),
         color: Colors.black12,
       ),
-      padding: const EdgeInsets.all(Dimens.margin_8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(_dockerItems.length, (index) {
-          return _buildItem(index);
+      padding: const EdgeInsets.all(Dimens.pad_8),
+      child: Stack(
+        children: List.generate(_icons.length, (index) {
+          return _buildAnimatedIcon(index);
         }),
       ),
     );
   }
 
-  /// Creates a draggable item for the Dock.
-  Widget _buildItem(int index) {
-    final item = _dockerItems[index];
-    return DraggableItem<T>(
-      item: item,
-      builder: widget.builder,
-      onUpdateItemsOrder: (draggedItem, index) {
+  /// Builds an animated icon with Apple Dock scaling.
+  Widget _buildAnimatedIcon(int index) {
+    return DockIcon(
+      icon: _icons[index],
+      index: index,
+      isDragging: _draggingIndex == index,
+      dragOffsetX: _dragOffsetX,
+      calculateScale: _calculateScale,
+      onPanStart: (details) {
         setState(() {
-          _updateDockerItemsOrder(draggedItem, index);
+          _draggingIndex = index;
+          _dragOffsetX = index * Dimens.itemSize;
         });
       },
-      index: index,
+      onPanUpdate: (details) {
+        setState(() {
+          _dragOffsetX += details.delta.dx;
+          _swapItems();
+        });
+      },
+      onPanEnd: () {
+        setState(() {
+          _draggingIndex = null;
+          _dragOffsetX = 0.0;
+        });
+      },
     );
   }
 
-  /// Updates the order of items when dragging.
-  void _updateDockerItemsOrder(T draggedItem, int targetIndex) {
-    final oldIndex = _dockerItems.indexOf(draggedItem);
-    _dockerItems.removeAt(oldIndex);
-    _dockerItems.insert(targetIndex, draggedItem);
+  /// Calculates the scaling factor for the Apple Dock effect.
+  double _calculateScale(int index) {
+    if (_draggingIndex == null) return 1.0;
+    final distance = (_dragOffsetX - index * Dimens.itemSize).abs();
+    return (1.5 - distance / Dimens.itemSize).clamp(1.0, 1.5);
+  }
+
+  /// Swap items during drag.
+  void _swapItems() {
+    if (_draggingIndex == null) return;
+    int newIndex = (_dragOffsetX / Dimens.itemSize).round().clamp(0, _icons.length - 1);
+
+    if (newIndex != _draggingIndex) {
+      setState(() {
+        final item = _icons.removeAt(_draggingIndex!);
+        _icons.insert(newIndex, item);
+        _draggingIndex = newIndex;
+      });
+    }
   }
 }
