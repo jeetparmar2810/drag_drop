@@ -19,14 +19,14 @@ class MyApp extends StatelessWidget {
             width: double.infinity,
             height: Dimens.sizeBox,
             child: Dock(
-              items: [
-                Icons.person,
-                Icons.message,
-                Icons.call,
-                Icons.camera,
-                Icons.photo,
-              ],
-            ),
+                  items: [
+                    Icons.person,
+                    Icons.message,
+                    Icons.call,
+                    Icons.camera,
+                    Icons.photo,
+                  ],
+                ),
           ),
         ),
       ),
@@ -57,8 +57,8 @@ class _DockState extends State<Dock> {
         color: Colors.black12,
       ),
       padding: const EdgeInsets.all(Dimens.pad_8),
-      child: Stack(
-        alignment: Alignment.center,
+      child:
+      Stack(
         children: List.generate(_icons.length, _buildAnimatedIcon),
       ),
     );
