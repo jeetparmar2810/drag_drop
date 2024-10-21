@@ -16,7 +16,8 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: LayoutBuilder(
           builder: (context, constraints) {
-            return Center(
+            return Align(
+              alignment: Alignment.center,
               child: SizedBox(
                 width: constraints.maxWidth,
                 height: Dimens.sizeBox,
@@ -106,7 +107,8 @@ class _DockState extends State<Dock> {
   /// Swaps items based on drag position.
   void _swapItems() {
     if (_draggingIndex == null) return;
-    int newIndex = (_dragOffsetX / Dimens.itemSize).round().clamp(0, _icons.length - 1);
+    int newIndex =
+        (_dragOffsetX / Dimens.itemSize).round().clamp(0, _icons.length - 1);
 
     if (newIndex != _draggingIndex) {
       setState(() {
