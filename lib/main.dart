@@ -12,27 +12,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: Scaffold(
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: constraints.maxWidth,
-                height: Dimens.sizeBox,
-                child: const Dock(
-                  items: [
-                    Icons.person,
-                    Icons.message,
-                    Icons.call,
-                    Icons.camera,
-                    Icons.photo,
-                  ],
-                ),
-              ),
-            );
-          },
+        body: Center(
+          child: SizedBox(
+            width: double.infinity,
+            height: Dimens.sizeBox,
+            child: Dock(
+              items: [
+                Icons.person,
+                Icons.message,
+                Icons.call,
+                Icons.camera,
+                Icons.photo,
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -63,6 +58,7 @@ class _DockState extends State<Dock> {
       ),
       padding: const EdgeInsets.all(Dimens.pad_8),
       child: Stack(
+        alignment: Alignment.center,
         children: List.generate(_icons.length, _buildAnimatedIcon),
       ),
     );
