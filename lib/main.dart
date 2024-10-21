@@ -1,33 +1,37 @@
 import 'package:dragdrop/app/utils/dimens.dart';
 import 'package:flutter/material.dart';
-
 import 'app/widgets/dock_icon.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
+/// Main application widget.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Apple Dock Effect',
+    return MaterialApp(
       home: Scaffold(
-        body: Center(
-          child: SizedBox(
-            height: Dimens.sizeBox, // Adjust height for the dock.
-            child: Dock(
-              items: [
-                Icons.person,
-                Icons.message,
-                Icons.call,
-                Icons.camera,
-                Icons.photo,
-              ],
-            ),
-          ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Center(
+              child: SizedBox(
+                width: constraints.maxWidth,
+                height: Dimens.sizeBox,
+                child: const Dock(
+                  items: [
+                    Icons.person,
+                    Icons.message,
+                    Icons.call,
+                    Icons.camera,
+                    Icons.photo,
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -58,14 +62,12 @@ class _DockState extends State<Dock> {
       ),
       padding: const EdgeInsets.all(Dimens.pad_8),
       child: Stack(
-        children: List.generate(_icons.length, (index) {
-          return _buildAnimatedIcon(index);
-        }),
+        children: List.generate(_icons.length, _buildAnimatedIcon),
       ),
     );
   }
 
-  /// Builds an animated icon with Apple Dock scaling.
+  /// Builds an animated icon with scaling effect.
   Widget _buildAnimatedIcon(int index) {
     return DockIcon(
       icon: _icons[index],
@@ -94,14 +96,14 @@ class _DockState extends State<Dock> {
     );
   }
 
-  /// Calculates the scaling factor for the Apple Dock effect.
+  /// Calculates the scaling factor for icons.
   double _calculateScale(int index) {
     if (_draggingIndex == null) return 1.0;
     final distance = (_dragOffsetX - index * Dimens.itemSize).abs();
     return (1.5 - distance / Dimens.itemSize).clamp(1.0, 1.5);
   }
 
-  /// Swap items during drag.
+  /// Swaps items based on drag position.
   void _swapItems() {
     if (_draggingIndex == null) return;
     int newIndex = (_dragOffsetX / Dimens.itemSize).round().clamp(0, _icons.length - 1);

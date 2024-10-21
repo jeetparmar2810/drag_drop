@@ -31,13 +31,13 @@ class DockIcon extends StatelessWidget {
       duration: const Duration(milliseconds: Dimens.duration),
       curve: Curves.easeInOut,
       left: isDragging ? dragOffsetX : index * itemWidth + 15,
-      top: 15 - (calculateScale(index) - 1) * 20, // Adjust height dynamically.
+      top: 15 - (calculateScale(index) - 1) * 20,
       child: GestureDetector(
         onPanStart: onPanStart,
         onPanUpdate: onPanUpdate,
         onPanEnd: (_) => onPanEnd(),
         child: Transform.scale(
-          scale: isDragging ? Dimens.opacityHigh : calculateScale(index), // Smooth scaling.
+          scale: isDragging ? Dimens.opacityHigh : calculateScale(index),
           child: Opacity(
             opacity: isDragging ? Dimens.opacityMid : Dimens.opacityReg,
             child: Container(
