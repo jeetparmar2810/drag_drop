@@ -6,7 +6,7 @@ void main() {
   runApp(const MyApp());
 }
 
-/// Main application widget.
+/// The main widget that initializes the app.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -19,14 +19,14 @@ class MyApp extends StatelessWidget {
             width: double.infinity,
             height: Dimens.sizeBox,
             child: Dock(
-                  items: [
-                    Icons.person,
-                    Icons.message,
-                    Icons.call,
-                    Icons.camera,
-                    Icons.photo,
-                  ],
-                ),
+              items: [
+                Icons.person,
+                Icons.message,
+                Icons.call,
+                Icons.camera,
+                Icons.photo,
+              ],
+            ),
           ),
         ),
       ),
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// Dock widget with Apple-like scaling effect.
+/// A widget that creates an Apple Dock-like effect with draggable icons.
 class Dock extends StatefulWidget {
   const Dock({super.key, required this.items});
 
@@ -53,38 +53,37 @@ class _DockState extends State<Dock> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Dimens.radius_8),
+        borderRadius: BorderRadius.circular(Dimens.radius8),
         color: Colors.black12,
       ),
-      padding: const EdgeInsets.all(Dimens.pad_8),
-      child:
-      Stack(
+      padding: const EdgeInsets.all(Dimens.pad8),
+      child: Stack(
         children: List.generate(_icons.length, _buildAnimatedIcon),
       ),
     );
   }
 
-  /// Builds an animated icon with scaling effect.
+  /// Creates a draggable and animated icon widget.
   Widget _buildAnimatedIcon(int index) {
     return DockIcon(
       icon: _icons[index],
       index: index,
       isDragging: _draggingIndex == index,
       dragOffsetX: _dragOffsetX,
-      calculateScale: _calculateScale,
-      onPanStart: (details) {
+      scaleFactor: _calculateScale,
+      onStart: (details) {
         setState(() {
           _draggingIndex = index;
           _dragOffsetX = index * Dimens.itemSize;
         });
       },
-      onPanUpdate: (details) {
+      onUpdate: (details) {
         setState(() {
           _dragOffsetX += details.delta.dx;
           _swapItems();
         });
       },
-      onPanEnd: () {
+      onEnd: () {
         setState(() {
           _draggingIndex = null;
           _dragOffsetX = 0.0;
@@ -93,18 +92,20 @@ class _DockState extends State<Dock> {
     );
   }
 
-  /// Calculates the scaling factor for icons.
+  /// Calculates the scaling factor for the icons based on proximity to the drag point.
   double _calculateScale(int index) {
     if (_draggingIndex == null) return 1.0;
     final distance = (_dragOffsetX - index * Dimens.itemSize).abs();
     return (1.5 - distance / Dimens.itemSize).clamp(1.0, 1.5);
   }
 
-  /// Swaps items based on drag position.
+  /// Swaps the positions of icons based on the current drag offset.
   void _swapItems() {
     if (_draggingIndex == null) return;
-    int newIndex =
-        (_dragOffsetX / Dimens.itemSize).round().clamp(0, _icons.length - 1);
+
+    final newIndex = (_dragOffsetX / Dimens.itemSize)
+        .round()
+        .clamp(0, _icons.length - 1);
 
     if (newIndex != _draggingIndex) {
       setState(() {
