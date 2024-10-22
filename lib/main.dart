@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         body: Center(
           child: SizedBox(
             width: double.infinity,
-            height: Dimens.sizeBox,
+            height: Dimens.dockHeight,
             child: Dock(
               items: [
                 Icons.person,
@@ -53,10 +53,10 @@ class _DockState extends State<Dock> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(Dimens.radius8),
+        borderRadius: BorderRadius.circular(Dimens.borderRadiusSmall),
         color: Colors.black12,
       ),
-      padding: const EdgeInsets.all(Dimens.pad8),
+      padding: const EdgeInsets.all(Dimens.paddingSmall),
       child: Stack(
         children: List.generate(_icons.length, _buildAnimatedIcon),
       ),
@@ -74,7 +74,7 @@ class _DockState extends State<Dock> {
       onStart: (details) {
         setState(() {
           _draggingIndex = index;
-          _dragOffsetX = index * Dimens.itemSize;
+          _dragOffsetX = index * Dimens.iconSize;
         });
       },
       onUpdate: (details) {
@@ -95,15 +95,15 @@ class _DockState extends State<Dock> {
   /// Calculates the scaling factor for the icons based on proximity to the drag point.
   double _calculateScale(int index) {
     if (_draggingIndex == null) return 1.0;
-    final distance = (_dragOffsetX - index * Dimens.itemSize).abs();
-    return (1.5 - distance / Dimens.itemSize).clamp(1.0, 1.5);
+    final distance = (_dragOffsetX - index * Dimens.iconSize).abs();
+    return (1.5 - distance / Dimens.iconSize).clamp(1.0, 1.5);
   }
 
   /// Swaps the positions of icons based on the current drag offset.
   void _swapItems() {
     if (_draggingIndex == null) return;
 
-    final newIndex = (_dragOffsetX / Dimens.itemSize)
+    final newIndex = (_dragOffsetX / Dimens.iconSize)
         .round()
         .clamp(0, _icons.length - 1);
 
